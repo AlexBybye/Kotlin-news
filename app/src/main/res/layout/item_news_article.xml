@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="@color/home_card_background"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/home_placeholder_background"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/topTagText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/home_chip_checked"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="@string/home_top_tag"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            android:textColor="@color/home_chip_text_checked"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/coverImageView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/topTagText"
+            tools:text="校园科技节正式启动，多项创新作品集中亮相" />
+
+        <TextView
+            android:id="@+id/summaryText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="@color/home_subtitle_text"
+            app:layout_constraintEnd_toStartOf="@id/coverImageView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/titleText"
+            tools:text="本周校园科技节正式开幕，多项学生创新作品和实验项目在主会场集中展示。" />
+
+        <TextView
+            android:id="@+id/sourceText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="@color/home_chip_text_checked"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/summaryText"
+            tools:text="校园新闻" />
+
+        <TextView
+            android:id="@+id/timeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="@color/home_subtitle_text"
+            app:layout_constraintBaseline_toBaselineOf="@id/sourceText"
+            app:layout_constraintStart_toEndOf="@id/sourceText"
+            tools:text="10:30" />
+
+        <ImageView
+            android:id="@+id/coverImageView"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:contentDescription="@string/home_image_description"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bg_news_cover_placeholder"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

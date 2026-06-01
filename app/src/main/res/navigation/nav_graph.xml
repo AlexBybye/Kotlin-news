@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.homework.ui.home.HomeFragment"
+        android:label="@string/menu_home">
+
+        <action
+            android:id="@+id/action_homeFragment_to_newsDetailFragment"
+            app:destination="@id/newsDetailFragment" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/discoverFragment"
+        android:name="com.example.homework.ui.discover.DiscoverFragment"
+        android:label="@string/menu_discover" />
+
+    <fragment
+        android:id="@+id/favoriteFragment"
+        android:name="com.example.homework.ui.favorite.FavoriteFragment"
+        android:label="@string/menu_favorite">
+
+        <action
+            android:id="@+id/action_favoriteFragment_to_newsDetailFragment"
+            app:destination="@id/newsDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.homework.ui.profile.ProfileFragment"
+        android:label="@string/menu_profile" />
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.homework.ui.search.SearchFragment"
+        android:label="@string/menu_search">
+
+        <action
+            android:id="@+id/action_searchFragment_to_newsDetailFragment"
+            app:destination="@id/newsDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/newsDetailFragment"
+        android:name="com.example.homework.ui.detail.NewsDetailFragment"
+        android:label="@string/detail_page_title">
+
+        <action
+            android:id="@+id/action_newsDetailFragment_self"
+            app:destination="@id/newsDetailFragment" />
+
+        <argument
+            android:name="newsId"
+            app:argType="string" />
+    </fragment>
+
+</navigation>

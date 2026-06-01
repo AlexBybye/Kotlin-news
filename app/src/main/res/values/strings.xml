@@ -1,0 +1,96 @@
+<resources>
+    <string name="app_name">校园新闻</string>
+
+    <string name="menu_home">首页</string>
+    <string name="menu_discover">发现</string>
+    <string name="menu_favorite">收藏</string>
+    <string name="menu_profile">我的</string>
+    <string name="menu_search">搜索</string>
+
+    <string name="home_title">首页</string>
+    <string name="home_subtitle">为你整理今日热点与分类新闻</string>
+    <string name="home_search_hint">搜索你感兴趣的新闻</string>
+    <string name="home_category_recommend">推荐</string>
+    <string name="home_category_technology">科技</string>
+    <string name="home_category_sports">体育</string>
+    <string name="home_category_campus">校园</string>
+    <string name="home_category_international">国际</string>
+    <string name="home_loading">正在加载新闻...</string>
+    <string name="home_empty_title">暂无新闻内容</string>
+    <string name="home_empty_subtitle">当前分类下还没有可展示的数据，请切换分类或稍后再试。</string>
+    <string name="home_error_title">加载失败</string>
+    <string name="home_error_default">新闻加载失败，请稍后重试。</string>
+    <string name="home_retry">重新加载</string>
+    <string name="home_cache_banner">当前展示的是离线缓存内容，可下拉刷新获取最新新闻。</string>
+    <string name="home_top_tag">置顶</string>
+    <string name="home_image_description">新闻封面图</string>
+    <string name="home_search_icon_description">搜索图标</string>
+    <string name="home_search_placeholder">搜索功能将在目标 4 中接入</string>
+    <string name="home_detail_unavailable">当前新闻缺少详情标识，请稍后重试。</string>
+
+    <string name="search_page_title">搜索新闻</string>
+    <string name="search_back_description">返回上一页</string>
+    <string name="search_input_hint">输入关键词搜索新闻</string>
+    <string name="search_action">搜索</string>
+    <string name="search_loading">正在搜索内容...</string>
+    <string name="search_empty_title">没有找到相关内容</string>
+    <string name="search_empty_subtitle">试试更换关键词，或点击下方热门搜索继续浏览。</string>
+    <string name="search_idle_title">搜索新闻</string>
+    <string name="search_idle_subtitle">输入关键词，或直接点击历史记录与热门搜索。</string>
+    <string name="search_error_title">搜索失败</string>
+    <string name="search_error_default">当前无法完成搜索，请稍后重试。</string>
+    <string name="search_retry">重新搜索</string>
+    <string name="search_history_title">最近搜索</string>
+    <string name="search_history_empty">你还没有搜索记录，试试搜一条校园热点。</string>
+    <string name="search_clear_history">清空</string>
+    <string name="search_hot_title">热门搜索</string>
+    <string name="search_hot_subtitle">点击关键词，快速查看相关内容。</string>
+    <string name="search_empty_keyword">请输入关键词后再搜索。</string>
+    <string name="search_detail_unavailable">当前搜索结果缺少详情标识，请稍后重试。</string>
+
+    <string name="detail_page_title">新闻详情</string>
+    <string name="detail_back_description">返回上一页</string>
+    <string name="detail_cover_description">详情封面图</string>
+    <string name="detail_category_label">分类</string>
+    <string name="detail_summary_title">摘要</string>
+    <string name="detail_content_title">正文</string>
+    <string name="detail_action_collect">收藏</string>
+    <string name="detail_action_collected">已收藏</string>
+    <string name="detail_action_share">分享</string>
+    <string name="detail_action_origin">原文</string>
+    <string name="detail_related_title">相关推荐</string>
+    <string name="detail_loading">正在加载详情内容...</string>
+    <string name="detail_error_title">详情加载失败</string>
+    <string name="detail_error_default">当前无法获取新闻详情，请稍后重试。</string>
+    <string name="detail_retry">重新加载</string>
+    <string name="detail_cache_banner">当前详情来自离线缓存，正文内容可能不是最新版本。</string>
+    <string name="detail_missing_id_error">未获取到新闻标识，请返回首页重试。</string>
+    <string name="detail_collect_added">已加入收藏。</string>
+    <string name="detail_collect_removed">已取消收藏。</string>
+    <string name="detail_share_placeholder">分享功能将在后续目标中接入。</string>
+    <string name="detail_origin_placeholder">原文跳转将在后续目标中接入。</string>
+    <string name="detail_related_meta_format">%1$s · %2$s</string>
+    <string name="detail_related_unavailable">当前推荐新闻缺少详情标识，请稍后重试。</string>
+
+    <string name="discover_title">发现</string>
+    <string name="discover_subtitle">热点专题与精选内容</string>
+    <string name="discover_tips">下一步将接入热搜词、专题聚合和热点内容。</string>
+
+    <string name="favorite_title">收藏</string>
+    <string name="favorite_subtitle">收藏文章与浏览记录</string>
+    <string name="favorite_loading">正在加载收藏内容...</string>
+    <string name="favorite_error_title">收藏页加载失败</string>
+    <string name="favorite_error_default">当前无法读取收藏和浏览历史，请稍后重试。</string>
+    <string name="favorite_retry">重新加载</string>
+    <string name="favorite_section_favorites">收藏文章</string>
+    <string name="favorite_section_histories">最近浏览</string>
+    <string name="favorite_empty_favorites">你还没有收藏新闻，去详情页点一下收藏试试。</string>
+    <string name="favorite_empty_histories">你还没有浏览记录，去首页看看今天的热点吧。</string>
+    <string name="favorite_all_empty_title">暂无本地内容</string>
+    <string name="favorite_all_empty_subtitle">收藏文章和浏览历史会显示在这里。</string>
+    <string name="favorite_detail_unavailable">当前条目缺少详情标识，请稍后重试。</string>
+
+    <string name="profile_title">我的</string>
+    <string name="profile_subtitle">设置与个人中心</string>
+    <string name="profile_tips">下一步将接入主题切换、字号设置和缓存管理。</string>
+</resources>
