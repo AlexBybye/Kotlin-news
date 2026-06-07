@@ -20,10 +20,10 @@ class NewsCategoryTest {
     }
 
     @Test
-    fun everyCategoryHasJuheType() {
+    fun everyCategoryHasApiValue() {
         NewsCategory.entries.forEach { category ->
-            assert(category.juheType.isNotBlank()) {
-                "category ${category.name} missing juheType"
+            assert(category.apiValue.isNotBlank()) {
+                "category ${category.name} missing apiValue"
             }
         }
     }

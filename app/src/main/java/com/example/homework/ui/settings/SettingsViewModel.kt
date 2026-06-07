@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.homework.data.config.AppConfig
 import com.example.homework.data.repository.LocalCacheRepository
 import com.example.homework.data.settings.AppSettings
 import com.example.homework.data.settings.DarkMode
@@ -63,6 +64,19 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             settingsManager.setAutoRefresh(enabled)
             _settings.value = settingsManager.current()
             NewsRefreshScheduler.setEnabled(getApplication(), enabled)
+        }
+    }
+
+    fun onUseBackendChanged(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsManager.setUseBackend(enabled)
+            AppConfig.useBackend = enabled
+            _settings.value = settingsManager.current()
+            _message.value = if (enabled) {
+                "已切换为后端模式，请重新登录以连接后端账号。"
+            } else {
+                "已切换为本地模式。"
+            }
         }
     }
 

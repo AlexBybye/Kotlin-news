@@ -9,12 +9,17 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
 /**
- * Retrofit / OkHttp 单例工厂。
+ * Retrofit / OkHttp 单例工厂，指向自建后端。
  *
- * OkHttp 配置了超时与日志拦截器，便于在调试阶段观察真实网络请求；
- * Moshi 负责 JSON 反序列化。
+ * - OkHttp 配置超时与日志拦截器，便于调试阶段观察真实网络请求；
+ * - 通过 [AuthTokenProvider] 在请求头自动附加 JWT；
+ * - Moshi 负责 JSON 反序列化。
  */
 object RetrofitClient {
+
+    /** 登录后由 AuthRepository 写入当前 JWT，供请求拦截器附加到 Authorization 头。 */
+    @Volatile
+    var authToken: String? = null
 
     private val moshi: Moshi by lazy {
         Moshi.Builder()
@@ -29,13 +34,20 @@ object RetrofitClient {
         OkHttpClient.Builder()
             .connectTimeout(NetworkConfig.CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .readTimeout(NetworkConfig.READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .addInterceptor { chain ->
+                val builder = chain.request().newBuilder()
+                authToken?.let { token ->
+                    builder.header("Authorization", "Bearer $token")
+                }
+                chain.proceed(builder.build())
+            }
             .addInterceptor(loggingInterceptor)
             .build()
     }
 
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl(NetworkConfig.BASE_URL)
+            .baseUrl(NetworkConfig.BACKEND_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()

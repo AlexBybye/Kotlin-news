@@ -23,7 +23,8 @@ class SettingsManager(private val context: Context) {
             darkMode = DarkMode.fromStorageValue(preferences[KEY_DARK_MODE]),
             fontScale = FontScale.fromStorageValue(preferences[KEY_FONT_SCALE]),
             wifiOnlyImages = preferences[KEY_WIFI_ONLY_IMAGES] ?: false,
-            autoRefresh = preferences[KEY_AUTO_REFRESH] ?: false
+            autoRefresh = preferences[KEY_AUTO_REFRESH] ?: false,
+            useBackend = preferences[KEY_USE_BACKEND] ?: false
         )
     }
 
@@ -48,6 +49,10 @@ class SettingsManager(private val context: Context) {
         context.settingsDataStore.edit { it[KEY_AUTO_REFRESH] = enabled }
     }
 
+    suspend fun setUseBackend(enabled: Boolean) {
+        context.settingsDataStore.edit { it[KEY_USE_BACKEND] = enabled }
+    }
+
     /** 同步读取字号，仅供 Activity.attachBaseContext 等无法挂起的场景使用。 */
     fun fontScaleSync(): FontScale {
         val value = syncPrefs().getInt(KEY_FONT_SCALE_SYNC, FontScale.STANDARD.storageValue)
@@ -67,6 +72,7 @@ class SettingsManager(private val context: Context) {
         private val KEY_FONT_SCALE = intPreferencesKey("font_scale")
         private val KEY_WIFI_ONLY_IMAGES = booleanPreferencesKey("wifi_only_images")
         private val KEY_AUTO_REFRESH = booleanPreferencesKey("auto_refresh")
+        private val KEY_USE_BACKEND = booleanPreferencesKey("use_backend")
         private const val KEY_FONT_SCALE_SYNC = "font_scale_sync"
         private const val KEY_WIFI_ONLY_SYNC = "wifi_only_sync"
 

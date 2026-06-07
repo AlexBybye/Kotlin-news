@@ -162,6 +162,22 @@
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="@color/home_subtitle_text" />
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/useBackendSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:minHeight="48dp"
+            android:text="@string/settings_use_backend"
+            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_use_backend_subtitle"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="@color/home_subtitle_text" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

@@ -6,7 +6,8 @@ data class AppSettings(
     val darkMode: DarkMode = DarkMode.FOLLOW_SYSTEM,
     val fontScale: FontScale = FontScale.STANDARD,
     val wifiOnlyImages: Boolean = false,
-    val autoRefresh: Boolean = false
+    val autoRefresh: Boolean = false,
+    val useBackend: Boolean = false
 )
 
 enum class DarkMode(val storageValue: Int, val displayName: String) {

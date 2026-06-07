@@ -86,6 +86,10 @@ class SettingsFragment : Fragment() {
             }
         }
         binding.clearCacheRow.setOnClickListener { viewModel.clearCache() }
+
+        binding.useBackendSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (!isBinding) viewModel.onUseBackendChanged(isChecked)
+        }
     }
 
     private fun requestNotificationPermissionIfNeeded() {
@@ -114,6 +118,7 @@ class SettingsFragment : Fragment() {
 
         binding.wifiOnlySwitch.isChecked = settings.wifiOnlyImages
         binding.autoRefreshSwitch.isChecked = settings.autoRefresh
+        binding.useBackendSwitch.isChecked = settings.useBackend
 
         isBinding = false
     }

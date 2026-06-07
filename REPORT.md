@@ -10,15 +10,15 @@
 
 本项目是一款面向校园场景的 Android 新闻客户端「校园新闻」。应用以「校园热点 + 综合新闻」为定位，覆盖新闻浏览、分类切换、详情阅读、搜索、收藏、点赞、浏览历史、离线缓存、个性化设置等完整功能链路，并实现了课程要求的**注册 / 登录**与多处**数据增删改查**能力。
 
-项目从零搭建，采用 Kotlin + MVVM + Repository 架构，使用 Room 操作本地数据库、Retrofit/OkHttp 进行网络请求、Navigation 管理页面跳转，并通过 WorkManager 实现定时刷新与通知提醒等加分能力。
+项目从零搭建，采用 Kotlin + MVVM + Repository 架构，使用 Room 操作本地数据库、Retrofit/OkHttp 进行网络请求、Navigation 管理页面跳转，并通过 WorkManager 实现定时刷新与通知提醒等加分能力。项目同时提供**自建后端**（Ktor + H2 + JWT），形成「Android 前端 + Web 后端」的完整全栈方案：App → 自建后端 → NewsAPI。
 
 ### 1.1 功能与评分对应
 
 | 评分项 | 对应实现 |
 |------|------|
-| APP 能正常运行（45） | 默认使用本地数据源，无网络 / 无后端依赖即可完整演示 |
+| APP 能正常运行（45） | 默认本地模式，无网络 / 无后端依赖即可完整演示；后端不可用时自动回退 |
 | 使用 ROOM 和 Repository 层（10） | 7 张数据表 + 多个 DAO，统一经 Repository 协调本地与远程数据 |
-| 创意加分（最多 25） | 真实新闻接口接入、离线缓存兜底、点赞、设置中心、深色模式、字号、定时刷新 + 通知、内置 WebView、分享 |
+| 创意加分（最多 25） | 自建后端（Ktor+JWT）、真实 NewsAPI 接入、离线缓存兜底、点赞、设置中心、深色模式、字号、定时刷新 + 通知、内置 WebView、分享 |
 | 报告内容（最高 20） | 本报告 |
 
 ---
@@ -73,18 +73,30 @@
 
 ### 3.1 整体架构
 
-应用采用 **MVVM + Repository** 分层，单向数据流：
+应用采用 **MVVM + Repository** 分层，单向数据流；并通过自建后端形成前后端分离架构：
 
 ```
+[Android 前端]
 UI (Activity / Fragment)
         ↓  观察 LiveData
 ViewModel  （持有 UI 状态，调度协程）
         ↓  调用
-Repository （协调远程与本地数据，统一返回 ResultWrapper）
+Repository （协调远程与本地数据，统一返回 ResultWrapper，失败回退缓存）
      ↙           ↘
 RemoteDataSource   LocalDataSource
 (Retrofit/OkHttp)   (Room / DataStore)
+        │
+        ↓ HTTP (JWT)
+[Web 后端 · Ktor]
+Routes → Service → (AuthService: H2/Exposed/BCrypt/JWT)
+                   (NewsService: Ktor Client)
+                          ↓ HTTP
+                     [NewsAPI 第三方新闻接口]
 ```
+
+数据来源由设置项「使用后端服务」开关（`AppConfig.useBackend`）统一控制：
+- **本地模式（默认）**：账号走本地 Room，新闻走内置 Mock，无网络/无后端即可完整演示。
+- **后端模式**：账号与新闻均走「App → 自建后端 → NewsAPI」；后端不可用时各 Repository 自动回退本地缓存/本地账号。
 
 ### 3.2 包结构
 
@@ -142,12 +154,24 @@ com.example.homework
 | ViewBinding | 类型安全的视图绑定 |
 | PBKDF2 | 密码加盐哈希 |
 
-### 3.5 设计亮点
+### 3.5 后端服务（Ktor）
 
-1. **数据源工厂 + 兜底策略**：`NewsDataSourceFactory` 在 Mock / Remote 间切换；Repository 在远程失败时自动回退到 Room 缓存，保证弱网/无网/无 Key 时仍可展示内容——直接应对课程「往年常因环境无法运行」的痛点。
-2. **统一结果封装**：`ResultWrapper<Success/Error>` 贯穿数据层到 UI，配合 `CacheAwareData` 标识数据来源（实时/缓存），UI 据此展示缓存提示。
-3. **同步镜像设置**：字号与图片策略需要在 `attachBaseContext`/图片加载等无法挂起的场景同步读取，故在 DataStore 之外维护一份 SharedPreferences 镜像。
-4. **安全实践**：密码哈希、定长比较、登录态隔离、清除缓存不误删用户数据。
+为体现「前端 + 后端」的综合性，项目自建了一个轻量后端（代码位于仓库 `backend/` 目录）：
+
+- **技术栈**：Ktor 2.3（Netty）+ Exposed ORM + H2 内嵌数据库 + JWT 鉴权 + BCrypt 密码哈希。
+- **职责**：① 账号服务（注册/登录，签发 JWT）；② 新闻代理（服务端调用 NewsAPI 并归一化为 App 统一 DTO，**NewsAPI 密钥仅存于后端，不下发客户端**）。
+- **接口**：`POST /auth/register`、`POST /auth/login`、`GET /auth/me`（需 Bearer Token）、`GET /news?category=`、`GET /news/detail/{id}`，统一响应 `{code,message,data}`。
+- **安全**：密码 BCrypt 加盐哈希；JWT 无状态鉴权；OkHttp 拦截器自动在请求头附加令牌。
+
+详见 `backend/README.md`。
+
+### 3.6 设计亮点
+
+1. **前后端分离 + 密钥后置**：新闻经「App → 后端 → NewsAPI」三段链路，NewsAPI 密钥只存在于后端，APK 中不含任何密钥，符合真实工程的安全实践。
+2. **数据源开关 + 兜底策略**：`AppConfig.useBackend` 统一切换本地/后端；Repository 在远程失败时自动回退 Room 缓存与本地账号，保证弱网/无网/后端未启动时仍可演示——直接应对课程「往年常因环境无法运行」的痛点。
+3. **统一结果封装**：`ResultWrapper<Success/Error>` 贯穿数据层到 UI，配合 `CacheAwareData` 标识数据来源（实时/缓存），UI 据此展示缓存提示。
+4. **同步镜像设置**：字号与图片策略需要在 `attachBaseContext`/图片加载等无法挂起的场景同步读取，故在 DataStore 之外维护一份 SharedPreferences 镜像。
+5. **安全实践**：前端 PBKDF2 / 后端 BCrypt 加盐哈希，定长比较，JWT 鉴权，清除缓存不误删用户数据。
 
 <!-- REPORT_CONTINUE_2 -->
 
@@ -178,27 +202,41 @@ com.example.homework
 - JDK 17
 - compileSdk 35 / minSdk 24 / targetSdk 35
 - Gradle 8.11.1，AGP 8.9.1，Kotlin 2.0.21
+- 后端：JDK 17 + Gradle（仅在使用后端模式演示时需要）
 
-### 5.2 运行步骤
+### 5.2 前端运行步骤
 
 1. Android Studio 打开 `Kotlin-news` 工程，等待 Gradle 同步。
-2. 直接运行 `app`，默认使用本地 Mock 数据源，**无需网络与后端即可完整体验全部功能**。
-3.（可选）接入真实新闻接口：在 `NetworkConfig.JUHE_APP_KEY` 填入聚合数据头条新闻 AppKey，并将 `NewsDataSourceFactory.currentMode` 设为 `REMOTE`；远程失败时会自动回退缓存。
+2. 直接运行 `app`，**默认本地模式，无需网络与后端即可完整体验全部功能**。
+3.（可选）后端模式：先启动后端（见 5.4），在 App「我的 → 设置 → 使用后端服务」中开启开关，重新登录即可走「App → 后端 → NewsAPI」链路。
 
-### 5.3 数据源切换说明
+### 5.3 数据来源切换说明
 
-| 模式 | 行为 |
-|----|----|
-| MOCK（默认） | 使用内置高质量校园新闻 Mock 数据，稳定可演示 |
-| REMOTE | 调用聚合数据头条接口，失败回退本地缓存 |
+| 模式 | 账号 | 新闻 | 说明 |
+|----|----|----|----|
+| 本地（默认） | 本地 Room | 内置 Mock | 稳定可演示，无外部依赖 |
+| 后端 | 自建后端(JWT) | 后端代理 NewsAPI | 真实链路；后端不可用自动回退本地 |
+
+模拟器访问宿主机后端地址为 `http://10.0.2.2:8080/`（真机改为后端主机局域网 IP），配置见 `NetworkConfig.BACKEND_BASE_URL`。
+
+### 5.4 后端运行步骤
+
+```bash
+cd backend
+export NEWS_API_KEY=<你的 NewsAPI 密钥>   # 不设则用 application.yaml 中的默认值
+./gradlew run
+```
+
+服务监听 `http://0.0.0.0:8080`，接口与示例见 `backend/README.md`。
 
 ---
 
 ## 六、开源代码使用说明
 
-- **聚合数据 · 头条新闻 API**（http://v.juhe.cn/toutiao/）：作为真实新闻数据来源之一，在 APP 中承担「真实网络新闻列表/详情」的获取，仅在 REMOTE 模式启用，默认不依赖。
-- 其余依赖均为 AndroidX / Material / Retrofit / OkHttp / Moshi / Coil / Room / WorkManager 等业界标准开源库，用于网络、数据库、图片加载、后台任务等基础能力。
-- 本项目未直接下载任何完整开源 App 作为提交内容，所有业务代码均为本组实现。
+- **NewsAPI**（https://newsapi.org）：真实新闻数据来源。由**自建后端**在服务端调用，密钥仅存于后端，客户端不接触；仅在后端模式启用，默认不依赖。
+- **后端框架**：Ktor、Exposed、H2、java-jwt、jBCrypt 等开源库，用于搭建 Web 后端服务。
+- **前端依赖**：AndroidX / Material / Retrofit / OkHttp / Moshi / Coil / Room / WorkManager 等业界标准开源库，用于网络、数据库、图片加载、后台任务等基础能力。
+- 本项目未直接下载任何完整开源 App 作为提交内容，所有业务代码（含前端与后端）均为本组实现。
 
 ---
 
@@ -216,25 +254,25 @@ com.example.homework
 
 ### 8.1 优点
 
-- 架构清晰、分层规范，组件覆盖面广，便于答辩讲解。
-- 兜底策略完善，演示环境鲁棒性高。
+- 架构清晰、分层规范，组件覆盖面广，且包含自建后端，综合性强，便于答辩讲解。
+- 兜底策略完善（后端不可用自动回退本地），演示环境鲁棒性高。
 - 功能链路完整，包含必做项与多个加分项。
-- 安全实践到位，密码不明文存储。
+- 安全实践到位，前后端密码均加盐哈希、后端 JWT 鉴权。
 
 ### 8.2 不足
 
-- 账号为本地单机存储，未做多端同步（受限于本期不自建后端的取舍）。
-- 头条接口无独立详情正文，详情页正文以摘要 + 原文跳转呈现。
+- 后端使用 H2 内嵌库，未接入生产级数据库（MySQL/PG），且未做容器化部署。
+- NewsAPI 为英文新闻源，详情正文受第三方接口限制（仅摘要 + 原文跳转）。
 - 未引入依赖注入框架（Hilt），依赖通过工厂方法手动装配。
 - UI 测试与端到端测试覆盖有限，目前以核心逻辑单元测试为主。
 
 ### 8.3 改进展望
 
-- 引入自建后端（如 Spring Boot / Ktor）实现账号云端化与多端同步。
+- 后端接入 MySQL/PostgreSQL 与 Docker 部署，并扩展点赞/收藏的云端同步。
 - 接入 Paging 3 实现真正的分页加载。
 - 引入 Hilt 完成依赖注入，进一步解耦。
 - 补充 Espresso UI 测试与更完整的 Repository 测试（含 Robolectric）。
-- 详情正文抓取与富文本渲染。
+- 接入中文新闻源或抓取详情正文并做富文本渲染。
 
 ---
 
