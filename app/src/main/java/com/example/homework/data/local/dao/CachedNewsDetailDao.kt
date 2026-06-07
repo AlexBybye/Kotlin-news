@@ -14,4 +14,10 @@ interface CachedNewsDetailDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: CachedNewsDetailEntity)
+
+    @Query("DELETE FROM cached_news_detail")
+    suspend fun clearAll()
+
+    @Query("SELECT COUNT(*) FROM cached_news_detail")
+    suspend fun count(): Int
 }

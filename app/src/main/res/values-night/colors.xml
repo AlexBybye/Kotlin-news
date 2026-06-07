@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- black 在浅色主题中作为图标 tint 使用，深色模式下改为浅色以保持可见。 -->
+    <color name="black">#FFE3E3E3</color>
+    <color name="home_chip_checked">#FF2A3A52</color>
+    <color name="home_chip_unchecked">#FF2C2C2E</color>
+    <color name="home_chip_text_checked">#FF8AB4F8</color>
+    <color name="home_chip_text_unchecked">#FFBDC1C6</color>
+    <color name="home_card_background">#FF1E1E1E</color>
+    <color name="home_placeholder_background">#FF3A3A3C</color>
+    <color name="home_subtitle_text">#FFBDC1C6</color>
+    <color name="brand_primary">#FF8AB4F8</color>
+    <color name="brand_primary_dark">#FF5E97F6</color>
+</resources>

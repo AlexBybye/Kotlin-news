@@ -12,6 +12,9 @@ interface BrowseHistoryDao {
     @Query("SELECT * FROM browse_history ORDER BY lastBrowseTime DESC LIMIT 20")
     suspend fun getRecentHistory(): List<BrowseHistoryEntity>
 
+    @Query("SELECT COUNT(*) FROM browse_history")
+    suspend fun count(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: BrowseHistoryEntity)
 

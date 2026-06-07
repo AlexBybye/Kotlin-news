@@ -6,10 +6,9 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import com.example.homework.R
 import com.example.homework.databinding.ItemNewsArticleBinding
 import com.example.homework.model.NewsArticle
+import com.example.homework.util.ImageLoadHelper
 
 class NewsAdapter(
     private val onArticleClick: (NewsArticle) -> Unit
@@ -44,11 +43,7 @@ class NewsAdapter(
             if (article.coverImageUrl.isNullOrBlank()) {
                 binding.coverImageView.setImageResource(R.drawable.bg_news_cover_placeholder)
             } else {
-                binding.coverImageView.load(article.coverImageUrl) {
-                    crossfade(true)
-                    placeholder(R.drawable.bg_news_cover_placeholder)
-                    error(R.drawable.bg_news_cover_placeholder)
-                }
+                ImageLoadHelper.loadCover(binding.coverImageView, article.coverImageUrl)
             }
 
             binding.root.setOnClickListener {

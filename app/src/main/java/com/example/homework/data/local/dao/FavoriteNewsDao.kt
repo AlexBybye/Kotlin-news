@@ -12,6 +12,9 @@ interface FavoriteNewsDao {
     @Query("SELECT * FROM favorite_news ORDER BY favoritedAt DESC")
     suspend fun getAllFavorites(): List<FavoriteNewsEntity>
 
+    @Query("SELECT COUNT(*) FROM favorite_news")
+    suspend fun count(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: FavoriteNewsEntity)
 

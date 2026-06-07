@@ -8,7 +8,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import coil.load
 import com.example.homework.R
 import com.example.homework.databinding.FragmentNewsDetailBinding
 import com.example.homework.model.NewsArticle
@@ -53,21 +52,61 @@ class NewsDetailFragment : Fragment() {
             viewModel.toggleCollect()
         }
 
+        binding.likeButton.setOnClickListener {
+            viewModel.toggleLike()
+        }
+
         binding.shareButton.setOnClickListener {
-            Snackbar.make(
-                binding.root,
-                getString(R.string.detail_share_placeholder),
-                Snackbar.LENGTH_SHORT
-            ).show()
+            shareCurrentArticle()
         }
 
         binding.originButton.setOnClickListener {
+            openOriginalArticle()
+        }
+    }
+
+    private fun shareCurrentArticle() {
+        val detail = viewModel.uiState.value?.detail ?: return
+        val shareText = buildString {
+            append(detail.title)
+            append('\n')
+            append(detail.summary)
+            detail.contentUrl?.let {
+                append('\n')
+                append(it)
+            }
+        }
+        val sendIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(android.content.Intent.EXTRA_SUBJECT, detail.title)
+            putExtra(android.content.Intent.EXTRA_TEXT, shareText)
+        }
+        startActivity(
+            android.content.Intent.createChooser(
+                sendIntent,
+                getString(R.string.detail_share_chooser_title)
+            )
+        )
+    }
+
+    private fun openOriginalArticle() {
+        val detail = viewModel.uiState.value?.detail ?: return
+        val url = detail.contentUrl
+        if (url.isNullOrBlank()) {
             Snackbar.make(
                 binding.root,
-                getString(R.string.detail_origin_placeholder),
+                getString(R.string.detail_origin_unavailable),
                 Snackbar.LENGTH_SHORT
             ).show()
+            return
         }
+        findNavController().navigate(
+            R.id.action_newsDetailFragment_to_webViewFragment,
+            Bundle().apply {
+                putString(com.example.homework.ui.web.WebViewFragment.ARG_URL, url)
+                putString(com.example.homework.ui.web.WebViewFragment.ARG_TITLE, detail.title)
+            }
+        )
     }
 
     private fun observeUiState() {
@@ -118,11 +157,12 @@ class NewsDetailFragment : Fragment() {
         binding.collectButton.text = getString(
             if (detail.isCollected) R.string.detail_action_collected else R.string.detail_action_collect
         )
+        binding.likeButton.text = getString(
+            if (detail.isLiked) R.string.detail_action_liked else R.string.detail_action_like
+        )
 
-        binding.coverImageView.load(detail.coverImageUrl) {
-            crossfade(true)
-            placeholder(R.drawable.bg_news_cover_placeholder)
-            error(R.drawable.bg_news_cover_placeholder)
+        binding.coverImageView.let { imageView ->
+            com.example.homework.util.ImageLoadHelper.loadCover(imageView, detail.coverImageUrl)
         }
 
         val paragraphs = detail.content

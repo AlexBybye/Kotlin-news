@@ -8,12 +8,16 @@ import com.example.homework.data.local.dao.BrowseHistoryDao
 import com.example.homework.data.local.dao.CachedNewsDao
 import com.example.homework.data.local.dao.CachedNewsDetailDao
 import com.example.homework.data.local.dao.FavoriteNewsDao
+import com.example.homework.data.local.dao.LikedNewsDao
 import com.example.homework.data.local.dao.SearchHistoryDao
+import com.example.homework.data.local.dao.UserDao
 import com.example.homework.data.local.entity.BrowseHistoryEntity
 import com.example.homework.data.local.entity.CachedNewsDetailEntity
 import com.example.homework.data.local.entity.CachedNewsEntity
 import com.example.homework.data.local.entity.FavoriteNewsEntity
+import com.example.homework.data.local.entity.LikedNewsEntity
 import com.example.homework.data.local.entity.SearchHistoryEntity
+import com.example.homework.data.local.entity.UserEntity
 
 @Database(
     entities = [
@@ -21,9 +25,11 @@ import com.example.homework.data.local.entity.SearchHistoryEntity
         FavoriteNewsEntity::class,
         BrowseHistoryEntity::class,
         CachedNewsEntity::class,
-        CachedNewsDetailEntity::class
+        CachedNewsDetailEntity::class,
+        UserEntity::class,
+        LikedNewsEntity::class
     ],
-    version = 3,
+    version = 5,
     exportSchema = false
 )
 abstract class HomeworkDatabase : RoomDatabase() {
@@ -33,6 +39,8 @@ abstract class HomeworkDatabase : RoomDatabase() {
     abstract fun browseHistoryDao(): BrowseHistoryDao
     abstract fun cachedNewsDao(): CachedNewsDao
     abstract fun cachedNewsDetailDao(): CachedNewsDetailDao
+    abstract fun userDao(): UserDao
+    abstract fun likedNewsDao(): LikedNewsDao
 
     companion object {
         @Volatile

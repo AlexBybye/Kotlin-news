@@ -32,7 +32,11 @@ class NewsDetailViewModel(application: Application) : AndroidViewModel(applicati
             when (val result = newsRepository.getNewsDetail(newsId)) {
                 is ResultWrapper.Success -> {
                     val isCollected = localNewsRepository.isFavorite(result.data.value.id)
-                    val detail = result.data.value.copy(isCollected = isCollected)
+                    val isLiked = localNewsRepository.isLiked(result.data.value.id)
+                    val detail = result.data.value.copy(
+                        isCollected = isCollected,
+                        isLiked = isLiked
+                    )
                     localNewsRepository.saveBrowseHistory(detail)
                     _uiState.value = NewsDetailUiState(
                         isLoading = false,
@@ -71,6 +75,23 @@ class NewsDetailViewModel(application: Application) : AndroidViewModel(applicati
                 getApplication<Application>().getString(com.example.homework.R.string.detail_collect_added)
             } else {
                 getApplication<Application>().getString(com.example.homework.R.string.detail_collect_removed)
+            }
+        }
+    }
+
+    fun toggleLike() {
+        val currentState = _uiState.value ?: return
+        val detail = currentState.detail ?: return
+
+        viewModelScope.launch {
+            val isLiked = localNewsRepository.toggleLike(detail.id)
+            _uiState.value = currentState.copy(
+                detail = detail.copy(isLiked = isLiked)
+            )
+            _message.value = if (isLiked) {
+                getApplication<Application>().getString(com.example.homework.R.string.detail_like_added)
+            } else {
+                getApplication<Application>().getString(com.example.homework.R.string.detail_like_removed)
             }
         }
     }

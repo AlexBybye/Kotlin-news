@@ -12,5 +12,6 @@ data class NewsDetail(
     val content: List<String>,
     val contentUrl: String?,
     val isCollected: Boolean = false,
+    val isLiked: Boolean = false,
     val relatedArticles: List<NewsArticle> = emptyList()
 )
