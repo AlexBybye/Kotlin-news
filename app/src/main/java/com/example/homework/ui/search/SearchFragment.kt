@@ -48,6 +48,16 @@ class SearchFragment : Fragment() {
         setupRecyclerView()
         setupInteractions()
         observeUiState()
+        consumeInitialQuery(savedInstanceState)
+    }
+
+    private fun consumeInitialQuery(savedInstanceState: Bundle?) {
+        // 仅在首次进入时根据传入关键词自动发起搜索，避免旋转重建后重复执行。
+        if (savedInstanceState != null) return
+        val initialQuery = arguments?.getString(ARG_QUERY)
+        if (!initialQuery.isNullOrBlank()) {
+            viewModel.onHotKeywordClicked(initialQuery)
+        }
     }
 
     private fun setupRecyclerView() {
@@ -198,5 +208,9 @@ class SearchFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        const val ARG_QUERY = "query"
     }
 }

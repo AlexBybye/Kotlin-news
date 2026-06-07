@@ -15,6 +15,12 @@ interface CachedNewsDao {
     @Query("DELETE FROM cached_news WHERE category = :category")
     suspend fun deleteByCategory(category: String)
 
+    @Query("DELETE FROM cached_news")
+    suspend fun clearAll()
+
+    @Query("SELECT COUNT(*) FROM cached_news")
+    suspend fun count(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(items: List<CachedNewsEntity>)
 }

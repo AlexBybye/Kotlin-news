@@ -42,6 +42,32 @@ class NewsRepository(
         }
     }
 
+    /**
+     * 聚合各分类的热点新闻，用于「发现」页展示。
+     * 优先选取置顶新闻，其次补充各分类首条，去重后返回。
+     */
+    suspend fun getTrendingNews(limit: Int = 8): ResultWrapper<List<NewsArticle>> {
+        val collected = mutableListOf<NewsArticle>()
+        var lastError: String? = null
+
+        for (category in NewsCategory.entries) {
+            when (val result = getNews(category)) {
+                is ResultWrapper.Success -> collected += result.data.value
+                is ResultWrapper.Error -> lastError = result.message
+            }
+        }
+
+        if (collected.isEmpty()) {
+            return ResultWrapper.Error(lastError ?: "暂时无法获取热点内容。")
+        }
+
+        val trending = collected
+            .distinctBy { it.id }
+            .sortedByDescending { it.isTop }
+            .take(limit)
+        return ResultWrapper.Success(trending)
+    }
+
     suspend fun getNewsDetail(newsId: String): ResultWrapper<CacheAwareData<NewsDetail>> {
         return when (val result = dataSource.getNewsDetail(newsId)) {
             is ResultWrapper.Success -> {

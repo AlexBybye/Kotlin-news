@@ -21,7 +21,16 @@
     <fragment
         android:id="@+id/discoverFragment"
         android:name="com.example.homework.ui.discover.DiscoverFragment"
-        android:label="@string/menu_discover" />
+        android:label="@string/menu_discover">
+
+        <action
+            android:id="@+id/action_discoverFragment_to_newsDetailFragment"
+            app:destination="@id/newsDetailFragment" />
+
+        <action
+            android:id="@+id/action_discoverFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/favoriteFragment"
@@ -36,7 +45,17 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.homework.ui.profile.ProfileFragment"
-        android:label="@string/menu_profile" />
+        android:label="@string/menu_profile">
+
+        <action
+            android:id="@+id/action_profileFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.homework.ui.settings.SettingsFragment"
+        android:label="@string/settings_title" />
 
     <fragment
         android:id="@+id/searchFragment"
@@ -46,6 +65,12 @@
         <action
             android:id="@+id/action_searchFragment_to_newsDetailFragment"
             app:destination="@id/newsDetailFragment" />
+
+        <argument
+            android:name="query"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 
     <fragment
@@ -57,9 +82,29 @@
             android:id="@+id/action_newsDetailFragment_self"
             app:destination="@id/newsDetailFragment" />
 
+        <action
+            android:id="@+id/action_newsDetailFragment_to_webViewFragment"
+            app:destination="@id/webViewFragment" />
+
         <argument
             android:name="newsId"
             app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/webViewFragment"
+        android:name="com.example.homework.ui.web.WebViewFragment"
+        android:label="@string/web_title">
+
+        <argument
+            android:name="url"
+            app:argType="string" />
+
+        <argument
+            android:name="title"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 
 </navigation>

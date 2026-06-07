@@ -40,6 +40,17 @@ class LocalCacheRepository(
         return cachedNewsDetailDao.getById(newsId)?.let(CacheNewsMapper::toNewsDetail)
     }
 
+    /** 缓存的新闻条目总数（列表 + 详情）。 */
+    suspend fun getCachedItemCount(): Int {
+        return cachedNewsDao.count() + cachedNewsDetailDao.count()
+    }
+
+    /** 清空所有新闻缓存（不影响收藏与浏览历史）。 */
+    suspend fun clearCache() {
+        cachedNewsDao.clearAll()
+        cachedNewsDetailDao.clearAll()
+    }
+
     companion object {
         fun createDefault(context: Context): LocalCacheRepository {
             val database = HomeworkDatabase.getInstance(context)
