@@ -3,10 +3,15 @@ package com.example.homework.data.repository
 import android.content.Context
 import com.example.homework.data.auth.PasswordHasher
 import com.example.homework.data.auth.SessionManager
+import com.example.homework.data.config.AppConfig
 import com.example.homework.data.local.HomeworkDatabase
 import com.example.homework.data.local.dao.UserDao
 import com.example.homework.data.local.entity.UserEntity
+import com.example.homework.data.remote.api.BackendApi
+import com.example.homework.data.remote.dto.LoginRequestDto
+import com.example.homework.data.remote.dto.RegisterRequestDto
 import com.example.homework.data.remote.network.ResultWrapper
+import com.example.homework.data.remote.network.RetrofitClient
 import com.example.homework.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -14,12 +19,17 @@ import kotlinx.coroutines.flow.map
 /**
  * 账号注册、登录与登录态管理。
  *
- * 账号数据通过 Room 持久化，密码以 PBKDF2 加盐哈希存储；
- * 登录态通过 [SessionManager]（DataStore）保存，重启后可自动恢复。
+ * 支持两种模式（由 [AppConfig.useBackend] 决定）：
+ *  - 本地模式：账号通过 Room 持久化，密码以 PBKDF2 加盐哈希存储。
+ *  - 后端模式：注册 / 登录走自建后端（BCrypt + JWT），返回的用户信息同时缓存进 Room，
+ *    令牌写入 [RetrofitClient.authToken] 供后续请求鉴权；后端不可用可回退本地账号校验。
+ *
+ * 登录态统一通过 [SessionManager]（DataStore）保存，重启后可自动恢复。
  */
 class AuthRepository(
     private val userDao: UserDao,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val backendApi: BackendApi = RetrofitClient.create()
 ) {
 
     /** 当前登录用户名流，null 表示未登录。 */
@@ -41,14 +51,27 @@ class AuthRepository(
         if (password != confirmPassword) {
             return ResultWrapper.Error("两次输入的密码不一致，请重新确认。")
         }
-        if (userDao.exists(trimmedUsername)) {
+
+        return if (AppConfig.useBackend) {
+            registerViaBackend(trimmedUsername, trimmedNickname, password)
+        } else {
+            registerLocally(trimmedUsername, trimmedNickname, password)
+        }
+    }
+
+    private suspend fun registerLocally(
+        username: String,
+        nickname: String,
+        password: String
+    ): ResultWrapper<User> {
+        if (userDao.exists(username)) {
             return ResultWrapper.Error("该用户名已被注册，请更换后再试。")
         }
 
         val salt = PasswordHasher.generateSalt()
         val entity = UserEntity(
-            username = trimmedUsername,
-            nickname = trimmedNickname.ifBlank { trimmedUsername },
+            username = username,
+            nickname = nickname.ifBlank { username },
             passwordHash = PasswordHasher.hash(password, salt),
             passwordSalt = salt,
             createdAt = System.currentTimeMillis()
@@ -63,13 +86,42 @@ class AuthRepository(
         }
     }
 
+    private suspend fun registerViaBackend(
+        username: String,
+        nickname: String,
+        password: String
+    ): ResultWrapper<User> {
+        return runCatching {
+            val response = backendApi.register(RegisterRequestDto(username, nickname, password))
+            val data = response.data
+            if (response.code != 0 || data == null) {
+                ResultWrapper.Error(response.message ?: "注册失败，请稍后重试。")
+            } else {
+                onBackendAuthSuccess(data.token, data.user.username, data.user.nickname, password)
+                ResultWrapper.Success(
+                    User(data.user.username, data.user.nickname, data.user.createdAt)
+                )
+            }
+        }.getOrElse { throwable ->
+            ResultWrapper.Error(throwable.message ?: "无法连接后端，请检查服务后重试。")
+        }
+    }
+
     suspend fun login(username: String, password: String): ResultWrapper<User> {
         val trimmedUsername = username.trim()
         if (trimmedUsername.isBlank() || password.isBlank()) {
             return ResultWrapper.Error("请输入用户名和密码。")
         }
 
-        val user = userDao.findByUsername(trimmedUsername)
+        return if (AppConfig.useBackend) {
+            loginViaBackend(trimmedUsername, password)
+        } else {
+            loginLocally(trimmedUsername, password)
+        }
+    }
+
+    private suspend fun loginLocally(username: String, password: String): ResultWrapper<User> {
+        val user = userDao.findByUsername(username)
             ?: return ResultWrapper.Error("用户名不存在，请先注册。")
 
         val passwordMatches = PasswordHasher.verify(
@@ -85,7 +137,52 @@ class AuthRepository(
         return ResultWrapper.Success(user.toUser())
     }
 
+    private suspend fun loginViaBackend(username: String, password: String): ResultWrapper<User> {
+        return runCatching {
+            val response = backendApi.login(LoginRequestDto(username, password))
+            val data = response.data
+            if (response.code != 0 || data == null) {
+                ResultWrapper.Error(response.message ?: "登录失败，请稍后重试。")
+            } else {
+                onBackendAuthSuccess(data.token, data.user.username, data.user.nickname, password)
+                ResultWrapper.Success(
+                    User(data.user.username, data.user.nickname, data.user.createdAt)
+                )
+            }
+        }.getOrElse { throwable ->
+            ResultWrapper.Error(throwable.message ?: "无法连接后端，请检查服务后重试。")
+        }
+    }
+
+    /**
+     * 后端登录 / 注册成功后的统一处理：
+     * 保存 JWT、写入会话，并把用户信息缓存进 Room（密码本地同样做哈希），
+     * 便于离线时读取当前用户与回退校验。
+     */
+    private suspend fun onBackendAuthSuccess(
+        token: String,
+        username: String,
+        nickname: String,
+        password: String
+    ) {
+        RetrofitClient.authToken = token
+        val salt = PasswordHasher.generateSalt()
+        runCatching {
+            userDao.insert(
+                UserEntity(
+                    username = username,
+                    nickname = nickname,
+                    passwordHash = PasswordHasher.hash(password, salt),
+                    passwordSalt = salt,
+                    createdAt = System.currentTimeMillis()
+                )
+            )
+        }
+        sessionManager.saveSession(username)
+    }
+
     suspend fun logout() {
+        RetrofitClient.authToken = null
         sessionManager.clearSession()
     }
 

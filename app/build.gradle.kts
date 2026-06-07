@@ -4,6 +4,16 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
 }
 
+// 从 local.properties 读取 NewsAPI 密钥，避免硬编码进源码。
+val newsApiKey: String = run {
+    val propsFile = rootProject.file("local.properties")
+    val props = java.util.Properties()
+    if (propsFile.exists()) {
+        propsFile.inputStream().use { props.load(it) }
+    }
+    props.getProperty("API_KEY", "")
+}
+
 android {
     namespace = "com.example.homework"
     compileSdk = 35
@@ -16,6 +26,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "NEWS_API_KEY", "\"$newsApiKey\"")
     }
 
     buildTypes {
@@ -37,6 +49,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
