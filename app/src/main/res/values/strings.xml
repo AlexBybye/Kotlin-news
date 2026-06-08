@@ -131,9 +131,33 @@
     <string name="settings_auto_refresh_subtitle">开启后将在后台定期刷新推荐新闻并提醒你查看。</string>
     <string name="settings_use_backend">使用后端服务（实时新闻 + 云端账号）</string>
     <string name="settings_use_backend_subtitle">开启后新闻与账号走自建后端（后端代理 NewsAPI）；关闭则使用本地账号与内置新闻数据。需先启动后端服务。</string>
+    <string name="settings_weather_city">天气城市</string>
+    <string name="settings_weather_city_action">选择</string>
+    <string name="settings_weather_city_value_format">%1$s · %2$s</string>
     <string name="settings_clear_cache">清除缓存</string>
     <string name="settings_clear_cache_action">清除</string>
     <string name="settings_cache_count_format">当前缓存 %1$d 条内容</string>
+
+    <!-- 天气城市 -->
+    <string name="weather_city_title">天气城市</string>
+    <string name="weather_city_back_description">返回设置</string>
+    <string name="weather_city_current_title">当前城市</string>
+    <string name="weather_city_id_format">城市 ID：%1$s</string>
+    <string name="weather_city_use_location">使用当前位置</string>
+    <string name="weather_city_use_location_subtitle">授权定位后自动解析最近的和风天气城市 ID。</string>
+    <string name="weather_city_locate_action">定位</string>
+    <string name="weather_city_permission_denied">未获得定位权限，无法根据当前位置选择天气城市。</string>
+    <string name="weather_city_common_title">常用城市</string>
+    <string name="weather_city_guangzhou">广州</string>
+    <string name="weather_city_beijing">北京</string>
+    <string name="weather_city_shanghai">上海</string>
+    <string name="weather_city_shenzhen">深圳</string>
+    <string name="weather_city_hangzhou">杭州</string>
+    <string name="weather_city_nanjing">南京</string>
+    <string name="weather_city_chengdu">成都</string>
+    <string name="weather_city_wuhan">武汉</string>
+    <string name="weather_city_xian">西安</string>
+    <string name="weather_city_chongqing">重庆</string>
 
     <!-- 认证 -->
     <string name="login_title">登录</string>

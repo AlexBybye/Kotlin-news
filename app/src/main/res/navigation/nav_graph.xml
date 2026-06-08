@@ -55,7 +55,17 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.homework.ui.settings.SettingsFragment"
-        android:label="@string/settings_title" />
+        android:label="@string/settings_title">
+
+        <action
+            android:id="@+id/action_settingsFragment_to_weatherCityFragment"
+            app:destination="@id/weatherCityFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/weatherCityFragment"
+        android:name="com.example.homework.ui.weather.WeatherCityFragment"
+        android:label="@string/weather_city_title" />
 
     <fragment
         android:id="@+id/searchFragment"
