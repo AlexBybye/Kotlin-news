@@ -18,7 +18,7 @@
 |------|------|
 | APP 能正常运行（45） | 默认本地模式，无网络 / 无后端依赖即可完整演示；后端不可用时自动回退 |
 | 使用 ROOM 和 Repository 层（10） | 7 张数据表 + 多个 DAO，统一经 Repository 协调本地与远程数据 |
-| 创意加分（最多 25） | 自建后端（Ktor+JWT）、真实 NewsAPI 接入、离线缓存兜底、点赞、设置中心、深色模式、字号、定时刷新 + 通知、内置 WebView、分享 |
+| 创意加分（最多 25） | 自建后端（Ktor+JWT）、真实 NewsAPI 接入、和风天气 API 集成、离线缓存兜底、点赞、设置中心、深色模式、字号、定时刷新 + 通知、内置 WebView、分享 |
 | 报告内容（最高 20） | 本报告 |
 
 ---
@@ -60,10 +60,19 @@
 
 ### 2.6 加分能力
 
-- 真实新闻接口（聚合数据 · 头条新闻）接入，Mock 兜底可一键切换。
+- 真实新闻接口（后端代理 NewsAPI）接入，本地 Mock 兜底可一键切换。
 - 离线缓存：网络异常时自动回退本地缓存内容。
 - 定时刷新 + 通知提醒（WorkManager + NotificationChannel）。
 - 内置 WebView 查看新闻原文、系统分享（ACTION_SEND）。
+
+### 2.7 天气模块（第三方 API 集成）
+
+首页顶部展示当前城市实时天气（温度、天气状况、体感、湿度），集成 **和风天气 RESTful API**：
+
+- 通过 Retrofit/OkHttp/Moshi 调用 `v7/weather/now`，天气状况以 emoji 图标呈现（离线安全、零缺图）。
+- 天气经 `WeatherRepository` 统一返回 `ResultWrapper`，成功写入本地缓存，失败时回退最近一次缓存，首页打开即可秒显。
+- **后台同步**：`WeatherSyncWorker` + WorkManager 每小时联网时自动刷新天气并更新缓存（满足「使用 Service」要求，底层基于 JobScheduler/系统服务）。
+- API Key 存于 `local.properties`，经 `BuildConfig.QWEATHER_API_KEY` 注入，不硬编码。
 
 <!-- REPORT_CONTINUE -->
 
@@ -183,7 +192,7 @@ com.example.homework
 
 1. **登录页**：应用标题、用户名/密码输入、登录按钮、跳转注册入口。截图占位：`[截图：登录页]`
 2. **注册页**：用户名/昵称/密码/确认密码，含输入校验提示。`[截图：注册页]`
-3. **首页**：搜索入口、分类 Tab、新闻列表、下拉刷新、缓存提示条。`[截图：首页]`
+3. **首页**：顶部实时天气卡片、搜索入口、分类 Tab、新闻列表、下拉刷新、缓存提示条。`[截图：首页（含天气卡片）]`
 4. **详情页**：封面、正文、点赞/收藏/分享/原文操作、相关推荐。`[截图：详情页]`
 5. **搜索页**：搜索框、热门词、历史词、结果列表。`[截图：搜索页]`
 6. **发现页**：热门搜索词 + 今日热点聚合列表。`[截图：发现页]`
@@ -234,6 +243,7 @@ export NEWS_API_KEY=<你的 NewsAPI 密钥>   # 不设则用 application.yaml �
 ## 六、开源代码使用说明
 
 - **NewsAPI**（https://newsapi.org）：真实新闻数据来源。由**自建后端**在服务端调用，密钥仅存于后端，客户端不接触；仅在后端模式启用，默认不依赖。
+- **和风天气 API**（https://dev.qweather.com）：首页实时天气数据来源。App 端通过 Retrofit 直连其 `devapi.qweather.com` 接口，密钥经 `local.properties` + `BuildConfig` 注入，不硬编码。
 - **后端框架**：Ktor、Exposed、H2、java-jwt、jBCrypt 等开源库，用于搭建 Web 后端服务。
 - **前端依赖**：AndroidX / Material / Retrofit / OkHttp / Moshi / Coil / Room / WorkManager 等业界标准开源库，用于网络、数据库、图片加载、后台任务等基础能力。
 - 本项目未直接下载任何完整开源 App 作为提交内容，所有业务代码（含前端与后端）均为本组实现。

@@ -31,6 +31,79 @@
         app:layout_constraintTop_toBottomOf="@id/titleText" />
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/weatherCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/home_chip_checked"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/subtitleText"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
+
+            <TextView
+                android:id="@+id/weatherIconText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="34sp"
+                tools:text="☀️" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/weatherCityText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="@color/home_chip_text_checked"
+                        android:textStyle="bold"
+                        tools:text="广州" />
+
+                    <TextView
+                        android:id="@+id/weatherTempText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="@color/home_chip_text_checked"
+                        tools:text="28°C" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/weatherDescText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="@color/home_subtitle_text"
+                    tools:text="晴 · 体感 30° · 湿度 60%" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/searchCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -40,7 +113,7 @@
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subtitleText"
+        app:layout_constraintTop_toBottomOf="@id/weatherCard"
         app:strokeColor="@color/home_placeholder_background"
         app:strokeWidth="1dp">
 

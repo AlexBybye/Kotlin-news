@@ -60,6 +60,28 @@ class HomeFragment : Fragment() {
         viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
             render(uiState)
         }
+
+        viewModel.weather.observe(viewLifecycleOwner) { weather ->
+            renderWeather(weather)
+        }
+    }
+
+    private fun renderWeather(weather: com.example.homework.model.WeatherNow?) {
+        if (weather == null) {
+            binding.weatherCard.isVisible = false
+            return
+        }
+        binding.weatherCard.isVisible = true
+        binding.weatherIconText.text =
+            com.example.homework.util.WeatherIconMapper.toEmoji(weather.iconCode)
+        binding.weatherCityText.text = weather.cityName
+        binding.weatherTempText.text = getString(R.string.home_weather_temp_format, weather.temperature)
+        binding.weatherDescText.text = getString(
+            R.string.home_weather_desc_format,
+            weather.text,
+            weather.feelsLike,
+            weather.humidity
+        )
     }
 
     private fun setupRecyclerView() {
@@ -74,6 +96,7 @@ class HomeFragment : Fragment() {
     private fun setupInteractions() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.refresh()
+            viewModel.loadWeather()
         }
 
         binding.retryButton.setOnClickListener {

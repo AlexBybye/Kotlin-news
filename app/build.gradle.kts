@@ -4,15 +4,17 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
 }
 
-// 从 local.properties 读取 NewsAPI 密钥，避免硬编码进源码。
-val newsApiKey: String = run {
+// 从 local.properties 读取密钥，避免硬编码进源码。
+val localProps: java.util.Properties = run {
     val propsFile = rootProject.file("local.properties")
     val props = java.util.Properties()
     if (propsFile.exists()) {
         propsFile.inputStream().use { props.load(it) }
     }
-    props.getProperty("API_KEY", "")
+    props
 }
+val newsApiKey: String = localProps.getProperty("API_KEY", "")
+val qweatherApiKey: String = localProps.getProperty("QWEATHER_API_KEY", "")
 
 android {
     namespace = "com.example.homework"
@@ -28,6 +30,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "NEWS_API_KEY", "\"$newsApiKey\"")
+        buildConfigField("String", "QWEATHER_API_KEY", "\"$qweatherApiKey\"")
     }
 
     buildTypes {
