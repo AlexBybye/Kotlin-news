@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -24,7 +25,9 @@ class SettingsManager(private val context: Context) {
             fontScale = FontScale.fromStorageValue(preferences[KEY_FONT_SCALE]),
             wifiOnlyImages = preferences[KEY_WIFI_ONLY_IMAGES] ?: false,
             autoRefresh = preferences[KEY_AUTO_REFRESH] ?: false,
-            useBackend = preferences[KEY_USE_BACKEND] ?: false
+            useBackend = preferences[KEY_USE_BACKEND] ?: false,
+            weatherLocationId = preferences[KEY_WEATHER_LOCATION_ID] ?: DEFAULT_WEATHER_LOCATION_ID,
+            weatherCityName = preferences[KEY_WEATHER_CITY_NAME] ?: DEFAULT_WEATHER_CITY_NAME
         )
     }
 
@@ -53,6 +56,18 @@ class SettingsManager(private val context: Context) {
         context.settingsDataStore.edit { it[KEY_USE_BACKEND] = enabled }
     }
 
+    suspend fun setWeatherLocation(locationId: String, cityName: String) {
+        context.settingsDataStore.edit {
+            it[KEY_WEATHER_LOCATION_ID] = locationId
+            it[KEY_WEATHER_CITY_NAME] = cityName
+        }
+        syncPrefs()
+            .edit()
+            .putString(KEY_WEATHER_LOCATION_ID_SYNC, locationId)
+            .putString(KEY_WEATHER_CITY_NAME_SYNC, cityName)
+            .apply()
+    }
+
     /** 同步读取字号，仅供 Activity.attachBaseContext 等无法挂起的场景使用。 */
     fun fontScaleSync(): FontScale {
         val value = syncPrefs().getInt(KEY_FONT_SCALE_SYNC, FontScale.STANDARD.storageValue)
@@ -64,6 +79,16 @@ class SettingsManager(private val context: Context) {
         return syncPrefs().getBoolean(KEY_WIFI_ONLY_SYNC, false)
     }
 
+    fun weatherLocationIdSync(): String {
+        return syncPrefs().getString(KEY_WEATHER_LOCATION_ID_SYNC, DEFAULT_WEATHER_LOCATION_ID)
+            ?: DEFAULT_WEATHER_LOCATION_ID
+    }
+
+    fun weatherCityNameSync(): String {
+        return syncPrefs().getString(KEY_WEATHER_CITY_NAME_SYNC, DEFAULT_WEATHER_CITY_NAME)
+            ?: DEFAULT_WEATHER_CITY_NAME
+    }
+
     private fun syncPrefs() =
         context.getSharedPreferences("app_settings_sync", Context.MODE_PRIVATE)
 
@@ -73,8 +98,12 @@ class SettingsManager(private val context: Context) {
         private val KEY_WIFI_ONLY_IMAGES = booleanPreferencesKey("wifi_only_images")
         private val KEY_AUTO_REFRESH = booleanPreferencesKey("auto_refresh")
         private val KEY_USE_BACKEND = booleanPreferencesKey("use_backend")
+        private val KEY_WEATHER_LOCATION_ID = stringPreferencesKey("weather_location_id")
+        private val KEY_WEATHER_CITY_NAME = stringPreferencesKey("weather_city_name")
         private const val KEY_FONT_SCALE_SYNC = "font_scale_sync"
         private const val KEY_WIFI_ONLY_SYNC = "wifi_only_sync"
+        private const val KEY_WEATHER_LOCATION_ID_SYNC = "weather_location_id_sync"
+        private const val KEY_WEATHER_CITY_NAME_SYNC = "weather_city_name_sync"
 
         @Volatile
         private var INSTANCE: SettingsManager? = null

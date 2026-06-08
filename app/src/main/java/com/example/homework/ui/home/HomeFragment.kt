@@ -66,6 +66,11 @@ class HomeFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadWeather()
+    }
+
     private fun renderWeather(weather: com.example.homework.model.WeatherNow?) {
         if (weather == null) {
             binding.weatherCard.isVisible = false

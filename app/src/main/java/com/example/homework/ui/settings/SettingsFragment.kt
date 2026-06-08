@@ -86,6 +86,9 @@ class SettingsFragment : Fragment() {
             }
         }
         binding.clearCacheRow.setOnClickListener { viewModel.clearCache() }
+        binding.weatherCityRow.setOnClickListener {
+            findNavController().navigate(R.id.action_settingsFragment_to_weatherCityFragment)
+        }
 
         binding.useBackendSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (!isBinding) viewModel.onUseBackendChanged(isChecked)
@@ -119,6 +122,11 @@ class SettingsFragment : Fragment() {
         binding.wifiOnlySwitch.isChecked = settings.wifiOnlyImages
         binding.autoRefreshSwitch.isChecked = settings.autoRefresh
         binding.useBackendSwitch.isChecked = settings.useBackend
+        binding.weatherCityValueText.text = getString(
+            R.string.settings_weather_city_value_format,
+            settings.weatherCityName,
+            settings.weatherLocationId
+        )
 
         isBinding = false
     }

@@ -7,8 +7,13 @@ data class AppSettings(
     val fontScale: FontScale = FontScale.STANDARD,
     val wifiOnlyImages: Boolean = false,
     val autoRefresh: Boolean = false,
-    val useBackend: Boolean = false
+    val useBackend: Boolean = false,
+    val weatherLocationId: String = DEFAULT_WEATHER_LOCATION_ID,
+    val weatherCityName: String = DEFAULT_WEATHER_CITY_NAME
 )
+
+const val DEFAULT_WEATHER_LOCATION_ID = "101280101"
+const val DEFAULT_WEATHER_CITY_NAME = "广州"
 
 enum class DarkMode(val storageValue: Int, val displayName: String) {
     FOLLOW_SYSTEM(0, "跟随系统"),
