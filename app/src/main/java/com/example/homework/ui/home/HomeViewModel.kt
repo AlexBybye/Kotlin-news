@@ -7,18 +7,37 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.homework.data.remote.network.ResultWrapper
 import com.example.homework.data.repository.NewsRepository
+import com.example.homework.data.repository.WeatherRepository
 import com.example.homework.model.NewsCategory
+import com.example.homework.model.WeatherNow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val newsRepository: NewsRepository = NewsRepository.createDefault(application)
+    private val weatherRepository: WeatherRepository = WeatherRepository.createDefault(application)
 
     private val _uiState = MutableLiveData(HomeUiState(isLoading = true))
     val uiState: LiveData<HomeUiState> = _uiState
 
+    private val _weather = MutableLiveData<WeatherNow?>(weatherRepository.getCachedWeather())
+    val weather: LiveData<WeatherNow?> = _weather
+
     init {
         loadNews()
+        loadWeather()
+    }
+
+    fun loadWeather() {
+        viewModelScope.launch {
+            when (val result = weatherRepository.getCurrentWeather()) {
+                is ResultWrapper.Success -> _weather.value = result.data
+                is ResultWrapper.Error -> {
+                    // 拉取失败时保留已有缓存展示，不打断新闻浏览。
+                    if (_weather.value == null) _weather.value = null
+                }
+            }
+        }
     }
 
     fun loadNews(
