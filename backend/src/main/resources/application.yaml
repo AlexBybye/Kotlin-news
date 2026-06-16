@@ -1,0 +1,20 @@
+ktor:
+    deployment:
+        port: 8080
+        host: 0.0.0.0
+    application:
+        modules:
+            - com.example.newsbackend.ApplicationKt.module
+
+# 应用自定义配置（通过 environment.config 读取）
+app:
+    # NewsAPI 密钥。优先读环境变量 NEWS_API_KEY；此处默认值仅便于本地演示，
+    # 正式提交/部署请改为通过环境变量注入，不要把真实密钥写入代码库。
+    newsApiKey: "$NEWS_API_KEY:b56a9e17aaf04c00890666158014bd87"
+    jwt:
+        secret: "$JWT_SECRET:campus-news-dev-secret-change-me"
+        issuer: "campus-news-backend"
+        audience: "campus-news-app"
+        realm: "campus-news"
+        # 令牌有效期（毫秒），默认 7 天
+        expiresInMs: 604800000
