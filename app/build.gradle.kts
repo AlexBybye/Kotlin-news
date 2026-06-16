@@ -4,10 +4,17 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
 }
 
+import java.util.Properties
+
+// Ensure Kotlin uses the same JVM toolchain as the JDK (17)
+kotlin {
+    jvmToolchain(17)
+}
+
 // 从 local.properties 读取密钥，避免硬编码进源码。
 val localProps: java.util.Properties = run {
     val propsFile = rootProject.file("local.properties")
-    val props = java.util.Properties()
+    val props = Properties()
     if (propsFile.exists()) {
         propsFile.inputStream().use { props.load(it) }
     }
@@ -18,12 +25,12 @@ val qweatherApiKey: String = localProps.getProperty("QWEATHER_API_KEY", "")
 
 android {
     namespace = "com.example.homework"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.homework"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -43,11 +50,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 
     buildFeatures {
